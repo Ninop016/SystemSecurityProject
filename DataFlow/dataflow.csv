@@ -1,0 +1,6 @@
+Source,Sink,Flow Type
+Sensor A,Cloud Storage,Data Upload
+Camera,Mobile App,Real-Time Stream
+Sensor A,API Server,Periodic Sync
+Microphone,Cloud Storage,Audio Upload
+Device B,Mobile App,Notifications

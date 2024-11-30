@@ -1,0 +1,16 @@
+pip install pandas networkx matplotlib
+
+
+Prepare a CSV File: Create a CSV file with the following structure:
+Source,Sink,Flow Type
+Sensor A,Cloud Storage,Data Upload
+Camera,Mobile App,Real-Time Stream
+Sensor A,API Server,Periodic Sync
+Microphone,Cloud Storage,Audio Upload
+Device B,Mobile App,Notifications
+
+
+Then run this:
+
+
+python iot_visualizer.py
