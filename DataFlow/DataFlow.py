@@ -151,6 +151,7 @@ def create_gui():
     Label(root, text="Load a CSV file containing 'Source', 'Sink', and 'Flow Type' columns.").pack(pady=5)
 
     Button(root, text="Load CSV", command=load_csv, width=20, bg="lightblue").pack(pady=10)
+    Button(root, text="Show Insights", command=lambda: show_insights(), width=20).pack(pady=5)
     Button(root, text="Quit", command=root.quit, width=20, bg="lightcoral").pack(pady=10)
 
     root.geometry("400x200")
