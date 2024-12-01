@@ -1,8 +1,9 @@
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
-from tkinter import Tk, filedialog, Button, Label, messagebox
+from tkinter import Tk, filedialog, Button, Label, messagebox, Menu, Toplevel, Text, Scrollbar, END
 import os
+import json
 
 # Function to load CSV file
 def load_csv():
@@ -17,6 +18,57 @@ def load_csv():
             visualize_data_flows(data)
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load CSV file: {e}")
+
+# Function to filter data
+def filter_data(data):
+    filter_window = Toplevel()
+    filter_window.title("Filter Data")
+    filter_window.geometry("400x200")
+
+    Label(filter_window, text="Filter By:").pack(pady=5)
+    Label(filter_window, text="Enter Source, Sink, or Flow Type:").pack(pady=5)
+    filter_entry = Text(filter_window, height=2, width=30)
+    filter_entry.pack(pady=5)
+
+    def apply_filter():
+        filter_value = filter_entry.get("1.0", END).strip()
+        if filter_value:
+            filtered_data = data[
+                (data['Source'].str.contains(filter_value, case=False, na=False)) |
+                (data['Sink'].str.contains(filter_value, case=False, na=False)) |
+                (data['Flow Type'].str.contains(filter_value, case=False, na=False))
+            ]
+            visualize_data_flows(filtered_data)
+        filter_window.destroy()
+
+    Button(filter_window, text="Apply Filter", command=apply_filter, width=15).pack(pady=10)
+
+# Function to save and load graph configurations
+def save_graph_config(G):
+    save_path = filedialog.asksaveasfilename(
+        defaultextension=".json",
+        filetypes=[("JSON Files", "*.json"), ("All Files", "*.*")]
+    )
+    if save_path:
+        nx.write_graphml(G, save_path)
+        messagebox.showinfo("Success", f"Configuration saved as: {save_path}")
+
+def load_graph_config():
+    file_path = filedialog.askopenfilename(
+        filetypes=[("GraphML Files", "*.graphml"), ("All Files", "*.*")]
+    )
+    if file_path:
+        try:
+            G = nx.read_graphml(file_path)
+            plt.figure(figsize=(10, 6))
+            pos = nx.spring_layout(G)
+            nx.draw(G, pos, with_labels=True, node_size=2000, node_color="skyblue")
+            edge_labels = nx.get_edge_attributes(G, 'flow_type')
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=9)
+            plt.title("Loaded Data Flow Graph", fontsize=14, fontweight="bold")
+            plt.show()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to load configuration: {e}")
 
 # Function to visualize data flows
 def visualize_data_flows(dataframe):
@@ -49,6 +101,46 @@ def visualize_data_flows(dataframe):
         plt.savefig(save_path)
         messagebox.showinfo("Success", f"Graph saved as: {save_path}")
     plt.show()
+
+# Function to display additional insights
+def show_insights(data):
+    insights = Toplevel()
+    insights.title("Data Insights")
+    insights.geometry("400x300")
+
+    text_area = Text(insights, wrap='word', font=("Helvetica", 12))
+    text_area.pack(expand=1, fill='both')
+    scrollbar = Scrollbar(insights, command=text_area.yview)
+    scrollbar.pack(side="right", fill="y")
+    text_area['yscrollcommand'] = scrollbar.set
+
+    # Generate insights
+    most_common_source = data['Source'].mode().iloc[0]
+    most_common_sink = data['Sink'].mode().iloc[0]
+    most_common_flow = data['Flow Type'].mode().iloc[0]
+    total_flows = len(data)
+
+    insights_text = f"""
+    Total Data Flows: {total_flows}
+    Most Common Source: {most_common_source}
+    Most Common Sink: {most_common_sink}
+    Most Common Flow Type: {most_common_flow}
+    """
+    text_area.insert(END, insights_text)
+
+# Function to add a help section
+def show_help():
+    help_window = Toplevel()
+    help_window.title("Help")
+    help_text = """
+    1. Load a CSV file containing 'Source', 'Sink', and 'Flow Type' columns.
+    2. Use the Filter Data option to filter by specific criteria.
+    3. Save graph configurations for later use.
+    4. Load previously saved graph configurations.
+    5. Export the graph in JSON or GraphML formats.
+    """
+    Label(help_window, text="Help Section", font=("Helvetica", 16, "bold")).pack(pady=10)
+    Text(help_window, wrap='word', height=10, width=50).pack(pady=5)
 
 # Create the GUI
 def create_gui():
