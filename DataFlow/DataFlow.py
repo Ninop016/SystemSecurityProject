@@ -1,7 +1,7 @@
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
-from tkinter import Tk, filedialog, Button, Label, messagebox, Menu, Toplevel, Text, Scrollbar, END
+from tkinter import Tk, filedialog, Button, Label, messagebox, Menu, Toplevel, Text, Scrollbar, END, simpledialog
 import os
 import json
 
@@ -128,6 +128,19 @@ def show_insights(data):
     """
     text_area.insert(END, insights_text)
 
+# Function to search the graph
+def search_graph(G):
+    query = simpledialog.askstring("Search Graph", "Enter a node or flow type to search:")
+    if query:
+        matching_edges = [
+            (u, v, data) for u, v, data in G.edges(data=True) if query in u or query in v or query in data.get('flow_type', '')
+        ]
+        if matching_edges:
+            results = "\n".join([f"{u} -> {v}: {data['flow_type']}" for u, v, data in matching_edges])
+            messagebox.showinfo("Search Results", f"Matching Flows:\n{results}")
+        else:
+            messagebox.showinfo("Search Results", "No matches found.")
+
 # Function to add a help section
 def show_help():
     help_window = Toplevel()
@@ -152,6 +165,7 @@ def create_gui():
 
     Button(root, text="Load CSV", command=load_csv, width=20, bg="lightblue").pack(pady=10)
     Button(root, text="Show Insights", command=lambda: show_insights(), width=20).pack(pady=5)
+    Button(root, text="Search Graph", command=lambda: search_graph(), width=20).pack(pady=5)
     Button(root, text="Quit", command=root.quit, width=20, bg="lightcoral").pack(pady=10)
 
     root.geometry("400x200")
