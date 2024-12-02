@@ -1,0 +1,6 @@
+Source,Sink,Flow Type
+SmartThermostat,CloudServer,encrypted
+SmartCamera,ThirdPartyAPI,plaintext
+WearableDevice,MobileApp,encrypted
+UntrustedSmartLock,SensitiveDatabase,plaintext
+SmartSpeaker,CloudServer,encrypted
