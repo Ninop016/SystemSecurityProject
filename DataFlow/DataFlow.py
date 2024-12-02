@@ -78,30 +78,25 @@ def visualize_data_flows(dataframe):
     for idx, row in dataframe.iterrows():
         G.add_edge(row['Source'], row['Sink'], flow_type=row['Flow Type'])
 
-    # Draw the graph
-    pos = nx.spring_layout(G)  # Layout for better visualization
-    plt.figure(figsize=(10, 6))
+    # Use a layout with a larger scale
+    pos = nx.spring_layout(G, scale=3, k=0.5)  # Increase scale and spacing with k
+
+    # Draw the graph with increased figure size
+    plt.figure(figsize=(14, 10))  # Larger figure size for better visualization
     nx.draw(
-        G, pos, with_labels=True, node_size=2000, node_color="skyblue",
-        font_size=10, font_weight="bold", edge_color="gray"
+        G, pos, with_labels=True, node_size=2000, font_size=12, node_color="skyblue",
+        font_weight="bold", edge_color="gray"
     )
 
-    # Add edge labels
+    # Add edge labels with extra padding
     edge_labels = {(row['Source'], row['Sink']): row['Flow Type'] for _, row in dataframe.iterrows()}
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=9)
-
-    plt.title("Sensitive Data Flows in IoT Apps", fontsize=14, fontweight="bold")
-    
-    # Save the graph as an image
-    save_path = filedialog.asksaveasfilename(
-        defaultextension=".png",
-        filetypes=[("PNG Files", "*.png"), ("All Files", "*.*")]
+    nx.draw_networkx_edge_labels(
+        G, pos, edge_labels=edge_labels, font_size=10, label_pos=0.6, rotate=False
     )
-    if save_path:
-        plt.savefig(save_path)
-        messagebox.showinfo("Success", f"Graph saved as: {save_path}")
-    plt.show()
 
+    plt.title("Sensitive Data Flows in IoT Apps", fontsize=16, fontweight="bold")
+    plt.show()
+    
 # Function to display additional insights
 def show_insights(data):
     insights = Toplevel()
@@ -141,6 +136,52 @@ def search_graph(G):
         else:
             messagebox.showinfo("Search Results", "No matches found.")
 
+# Function to detect anomalies
+def detect_anomalies(dataframe):
+    anomalies = []
+
+    for idx, row in dataframe.iterrows():
+        source = row['Source']
+        sink = row['Sink']
+        flow_type = row['Flow Type']
+
+        # Rule 1: Unexpected Source-Sink combinations
+        if source.lower().startswith("untrusted") and sink.lower().startswith("sensitive"):
+            anomalies.append(f"Anomaly: Data from untrusted source '{source}' to sensitive sink '{sink}'.")
+
+        # Rule 2: Sensitive data transmitted in plaintext
+        if "plaintext" in flow_type.lower() and "sensitive" in sink.lower():
+            anomalies.append(f"Anomaly: Sensitive data transmitted in plaintext from '{source}' to '{sink}'.")
+
+    return anomalies
+
+# Function to show anomalies
+def show_anomalies(dataframe):
+    """
+    Analyze the data and display anomalies in a new window.
+    """
+    anomalies = detect_anomalies(dataframe)
+
+    if not anomalies:
+        messagebox.showinfo("No Anomalies", "No anomalies detected in the data.")
+        return
+
+    # Display anomalies in a new window
+    anomalies_window = Toplevel()
+    anomalies_window.title("Detected Anomalies")
+    anomalies_window.geometry("400x300")
+
+    text_area = Text(anomalies_window, wrap='word', font=("Helvetica", 12))
+    text_area.pack(expand=1, fill='both')
+    scrollbar = Scrollbar(anomalies_window, command=text_area.yview)
+    scrollbar.pack(side="right", fill="y")
+    text_area['yscrollcommand'] = scrollbar.set
+
+    for anomaly in anomalies:
+        text_area.insert(END, f"{anomaly}\n\n")
+
+    Button(anomalies_window, text="Close", command=anomalies_window.destroy).pack(pady=10)
+
 # Function to add a help section
 def show_help():
     help_window = Toplevel()
@@ -166,6 +207,9 @@ def create_gui():
     Button(root, text="Load CSV", command=load_csv, width=20, bg="lightblue").pack(pady=10)
     Button(root, text="Show Insights", command=lambda: show_insights(), width=20).pack(pady=5)
     Button(root, text="Search Graph", command=lambda: search_graph(), width=20).pack(pady=5)
+    Button(root, text="Detect Anomalies", 
+       command=lambda: show_anomalies(pd.read_csv(filedialog.askopenfilename())), 
+       width=20, bg="orange").pack(pady=5)
     Button(root, text="Quit", command=root.quit, width=20, bg="lightcoral").pack(pady=10)
 
     root.geometry("400x200")
