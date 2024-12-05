@@ -1,0 +1,4 @@
+Run ifconfig on your mac and get the ip address of your en0:
+
+
+Then run the program by using sudo python discovery.py and enter the ip address

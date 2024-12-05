@@ -66,7 +66,7 @@ def visualize_vendors(devices):
 
 if __name__ == "__main__":
     print("IoT Device Discovery")
-    network_range = input("Enter your network range (e.g., 192.168.1.0/24): ")
+    network_range = input("Enter your network range ")
 
     print("\nScanning network...")
     devices = discover_devices(network_range)
