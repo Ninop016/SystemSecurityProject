@@ -12,7 +12,7 @@ Search Graph: input a node or flow to search for in the figures generated
 Detect anomalies: detects any leaks in the CSV file loaded
 Quit: terminates the program
 
-#For "SystemSecurityProject\First Idea\New Idea\saintProto.py"
+# For "SystemSecurityProject\First Idea\New Idea\saintProto.py"
 source_folder = 'SystemSecurityProject\smartThings\smartThings-SainT\smartThings-SainT-sensitive-data-leaks-benchmark-apps'  // Replace with your source folder path
 
 report_folder = 'SystemSecurityProject\smartThings\smartThings-SainT\smartThings-SainT-sensitive-data-leaks-benchmark-apps\Reports' //Replace with your report folder path
