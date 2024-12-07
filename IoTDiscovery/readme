@@ -2,3 +2,10 @@ Run ifconfig on your mac and get the ip address of your en0:
 
 
 Then run the program by using sudo python discovery.py and enter the ip address
+
+
+
+For "SystemSecurityProject\First Idea\New Idea\saintProto.py"
+source_folder = 'SystemSecurityProject\smartThings\smartThings-SainT\smartThings-SainT-sensitive-data-leaks-benchmark-apps'  # Replace with your source folder path
+report_folder = 'SystemSecurityProject\smartThings\smartThings-SainT\smartThings-SainT-sensitive-data-leaks-benchmark-apps\Reports'  # Replace with your report folder path
+run saintProto.py , then check the reports folder for analysis results
