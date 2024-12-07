@@ -1,0 +1,11 @@
+Potential sensitive data flows detected:
+
+Source: input -> Sink: send
+Potential Risk: Sensitive data read by input could be exposed through send
+
+Source: get -> Sink: send
+Potential Risk: Sensitive data read by get could be exposed through send
+
+Source: post -> Sink: send
+Potential Risk: Sensitive data read by post could be exposed through send
+
